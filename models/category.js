@@ -12,9 +12,7 @@ const categorySchema = new mongoose.Schema({
     name: { type: String, required: true, validate: /\S+/ },
     //创建者id
     author_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-
-    // 分类描述
-    desc: { type: String, default: '' },
+    username: { type: String, required: true },
 
     // 创建日期
     create_time: { type: Date, default: Date.now },

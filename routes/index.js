@@ -5,9 +5,17 @@ const user = require('./user');
 const article = require('./article');
 const category = require('./category');
 const tags = require('./tags');
-
+const blogtopub = require("./api-public")
 module.exports = app => {
-    app.post('/api/register', user.register);
+
+    app.post('/api/getArticleList', blogtopub.getArticleList);
+    app.get('/api/getArticleDetail', blogtopub.getArticleDetail);
+    app.get('/api/getArticleTimeLine', blogtopub.getArticleTimeLine);
+    app.get('/api/getArticleListSe', blogtopub.getArticleListSe);
+    app.post('/api/getCategoryNum', blogtopub.getCategoryNum);
+    app.post('/api/searchArticle', blogtopub.searchArticle)
+
+    // app.post('/api/register', user.register);
     app.post('/api/login', user.login);
 
     app.post('/addArticle', article.addArticle)
@@ -25,8 +33,7 @@ module.exports = app => {
     app.post('/getCategoryNum', category.getCategoryNum);
     app.get('/getCategoryList', category.getCategoryList);
 
-    app.post('/addTags', tags.addTags);
-    app.post('/delTags', tags.delTags);
+
     app.get('/getTagsList', tags.getTagsList);
 
 

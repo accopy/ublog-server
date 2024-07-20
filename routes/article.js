@@ -12,7 +12,6 @@ exports.addArticle = (req, res) => {
         category,
         state,
     } = req.body;
-    let author_id = req.auth.id
 
     //设置category属性
     let categoryName = category.label
@@ -33,15 +32,18 @@ exports.addArticle = (req, res) => {
         categoryName: categoryName,
 
     });
-    tempArticle.author = req.auth.id
+
+    tempArticle.author_id = req.auth.id;
+    tempArticle.username = req.auth.username;
 
     tempArticle
         .save()
         .then(data => {
             res.send(Result.success('保存成功!'))
             // 添加到tags表中，目前不反回id,仅测试
+            handleTag('articleAdd', data.tagsName, req.auth)
+            console.log('data', data);
 
-            addTag(tagsName, req.auth.id)
 
         })
         .catch(err => {
@@ -65,18 +67,18 @@ exports.getArticleList = async (req, res) => {
     //查询类型处理
     //分类查询
     if (queryinfo.querytype == 'recent') {
-        query = { author: req.auth.id };
+        query = { author_id: req.auth.id };
         //执行
         getPage()
     }
     else if (queryinfo.querytype == 'category') {
-        query = { author: req.auth.id, category: req.body.queryinfo.categoryid }
+        query = { author_id: req.auth.id, category: req.body.queryinfo.categoryid }
         //执行
         getPage()
     }
     //标签查询
     else if (queryinfo.querytype == 'tags') {
-        query = { author: req.auth.id, tagsName: { $elemMatch: { $eq: req.body.queryinfo.key } } }
+        query = { author_id: req.auth.id, tagsName: { $elemMatch: { $eq: req.body.queryinfo.key } } }
         let num = await Article.countDocuments(query).catch(err => {
             throw err
 
@@ -173,7 +175,7 @@ exports.getArticleTimeLine = async (req, res) => {
     const archiveList = []
     let obj = {}
     // 按年份归档 文章数组
-    let temp = await Article.find({ author: req.auth.id }, { create_time: 1, _id: 1, title: 1 }).sort({ create_time: -1 })
+    let temp = await Article.find({ author_id: req.auth.id }, { create_time: 1, _id: 1, title: 1 }).sort({ create_time: -1 })
 
 
     temp.forEach(e => {
@@ -219,15 +221,13 @@ exports.getArticleTimeLine = async (req, res) => {
 };
 
 
-//
+//获取最近更新
 exports.getArticleListSe = (req, res) => {
 
-    Article.find({ author: req.auth.id }, { _id: 1, title: 1 }).sort({ create_time: -1 }).limit(7).then(e => {
+    Article.find({ author_id: req.auth.id }, { _id: 1, title: 1 }).sort({ create_time: -1 }).limit(7).then(e => {
         if (e) {
             res.send(Result.success(e))
         }
-
-
     })
         .catch(err => {
             throw err
@@ -241,7 +241,7 @@ exports.searchArticle = (req, res) => {
 
     if (key) {
         Article.find({
-            author: req.auth.id, $or: [
+            author_id: req.auth.id, $or: [
                 { title: { $regex: key, $options: 'i' } }, // 包含关键字1的标题
                 { content: { $regex: key, $options: 'i' } } // 包含关键字2的内容
             ]
@@ -264,7 +264,6 @@ exports.searchArticle = (req, res) => {
 exports.updateArticle = (req, res) => {
     const {
         title,
-        author,
         content,
         img_url,
         category,
@@ -272,37 +271,40 @@ exports.updateArticle = (req, res) => {
         tagsName,
         _id,
     } = req.body;
+    // console.log('传过来的tagsName', tagsName);
 
     //设置category属性
     let categoryName = category.label
     let categoryId = category.value
-    console.log('categoryName', categoryName);
-    console.log('categoryId', categoryId);
+    // console.log('categoryName', categoryName);
+    // console.log('categoryId', categoryId);
 
     Article.findOneAndUpdate(
         { _id },
         {
             title,
-            author,
             content,
             img_url,
-            categoryName,
-            categoryId,
+            category,
             state,
             tagsName,
+            categoryName,
+            category: categoryId,
             update_time: Date.now()
         },
     ).then(response => {
         if (response) {
+            //response为修改之前的数据
             res.send(Result.success(response))
+            // console.log('response', response);
+            //旧标签查询，若无则删除,并新增
+            handleTag("articleEdit", tagsName, req.auth, response.tagsName)
 
-            addTag(tagsName, author)
         }
 
 
     })
         .catch(err => {
-            console.log(err);
             throw err
 
         });
@@ -313,12 +315,15 @@ exports.updateArticle = (req, res) => {
 //删除文章
 exports.delArticle = (req, res) => {
     let { id } = req.body;
-    Article.deleteMany({ _id: id })
+    Article.findByIdAndDelete({ _id: id })
         .then(result => {
-            console.log('result', result);
+            // console.log('deleteManyresult', result);
 
-            if (result.deletedCount == 1) {
+            if (result) {
                 res.send(Result.success('删除成功'))
+                //旧标签查询，若无则删除,并新增
+                handleTag("articleDelete", result.tagsName, req.auth)
+
             } else {
                 res.send(Result.validateFailed('文章不存在'))
             }
@@ -328,15 +333,12 @@ exports.delArticle = (req, res) => {
         });
 };
 
-//定义添加
-function addTag(arr, author_id) {
-    for (let i = 0; i < arr.length; i++) {
-        let query = { author_id, name: arr[i] }
-
-        Tags.findOne(query)
-            .then(result => {
-                console.log('result', result);
-
+//标签同步处理
+async function handleTag(type, arr, user, oldarr) {
+    if (type == 'articleAdd') {
+        for (let i = 0; i < arr.length; i++) {
+            let query = { author_id: user.id, name: arr[i], username: user.username }
+            Tags.findOne(query).then(result => {
                 if (!result) {
                     let temptags = new Tags(query);
                     temptags
@@ -345,16 +347,58 @@ function addTag(arr, author_id) {
                             throw err;
                         });
                 }
-                else {
-                    console.log('已存在');
+            })
+        }
+
+    }
+    else if (type == 'articleEdit') {
+
+        //删除无效标签
+        for (let i = 0; i < oldarr.length; i++) {
+            let query = { author_id: user.id, tagsName: oldarr[i], username: user.username }
+
+            let result = await Article.countDocuments(query)
+            if (result == 0) {
+                Tags.findOneAndDelete({ name: query.tagsName, author_id: user.id, }).then(result => { })
+            }
+
+        }
+        // 新增标签
+
+
+        for (let i = 0; i < arr.length; i++) {
+            let query = { author_id: user.id, name: arr[i], username: user.username }
+            Tags.findOne(query).then(result => {
+                if (!result) {
+                    let temptags = new Tags(query);
+                    temptags
+                        .save()
+                        .catch(err => {
+                            throw err;
+                        });
                 }
             })
-            .catch(err => {
-                throw err;
-                console.log('出错了');
 
-            });
+        }
+    }
+    else if (type == 'articleDelete') {
+        console.log('删除');
 
+        //删除无效标签
+        for (let i = 0; i < arr.length; i++) {
+            let query = { author_id: user.id, tagsName: arr[i], username: user.username }
+
+            let result = await Article.countDocuments(query)
+            console.log('包含标签的数量为', result);
+
+            if (result == 0) {
+                console.log('为0删除');
+                console.log('query.tagsName', query.tagsName);
+
+                Tags.findOneAndDelete({ name: arr[i], author_id: user.id, }).then(result => { })
+            }
+
+        }
     }
 
 

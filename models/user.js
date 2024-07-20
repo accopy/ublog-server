@@ -5,20 +5,29 @@ let userSchema = mongoose.Schema(
     {
         name: {
             type: String,
-            required: true
+            required: true,
+            default: 'user'
         },
         email: {
             type: String,
             default: '',
-            required: true,
             validate: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/,
+        },
+        username: {
+            type: String,
+            required: true,
+        },
+        avatar: {
+            type: String,
+            default: 'null'
+
         },
         // 密码
         password: {
             type: String,
             required: true,
         },
-        //用户类型
+        //用户类型 0管理员,1普通用户
         type: { type: Number, default: 1 },
 
         // 创建日期

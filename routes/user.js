@@ -4,10 +4,10 @@ const { setToken } = require('../utils/token')
 const Result = require("../utils/utils")
 
 //注册
-exports.register = (req, res) => {
+exports.register = async (req, res) => {
 
-    let { password, email, type } = req.body;
-    let name = 2;
+    let { password, email, type, username } = req.body;
+
 
     if (!email) {
         res.send(Result.validateFailed('邮箱不能为空！'))
@@ -20,66 +20,61 @@ exports.register = (req, res) => {
         res.send(Result.validateFailed('请输入格式正确的邮箱！'))
         return;
     }
-    if (!name) {
+    if (!username) {
         res.send(Result.validateFailed('用户名不可为空！'))
         return;
     }
     if (!password) {
-        res.send(Result.validateFailed('用户名不可为空！'))
+        res.send(Result.validateFailed('密码不可为空！'))
         return;
     }
+
     //验证用户是否已经在数据库中
-    User.findOne({ email: email })
-        .then(data => {
-            if (data) {
-                res.send(Result.validateFailed('用户邮箱已存在！'))
-                return;
-            }
-            //保存到数据库
-            let user = new User({
-                email,
-                name,
-                password,
-                type,
-            });
-            user.save().then(data => {
-                console.log('data', data);
-                res.send(Result.success('注册成功！'))
+    let result = await Promise.all([User.findOne({ email: email }).catch(err => {
+        res.send(Result.validateFailed('服务端错误！'))
 
-                //插入分类
-                if (data.id) {
-                    createDefautCateGory(data.id)
-                }
+    }), User.findOne({ username: username }).catch(err => {
+        res.send(Result.validateFailed('服务端错误！'))
 
-            });
-        })
-        .catch(err => {
-            res.send(res);
-            return;
-        });
-    function createDefautCateGory(id) {
+    })])
 
-        //创建默认分类目录
-        const category = [
-            { author_id: id, name: '知识技能' },
-            { author_id: id, name: '应用笔记' },
-            { author_id: id, name: '经验谈' },
-            { author_id: id, name: '生活思考' },
-            { author_id: id, name: '其他' },
-
-        ];
-
-        Category.insertMany(category)
+    if (result[0]) {
+        res.send(Result.validateFailed('用户邮箱已存在！'))
+        return;
     }
+    else if (result[1]) {
+        res.send(Result.validateFailed('用户名已存在！'))
+        return;
+    } else {
+        //创建用户
+        let user = new User({
+            email,
+            username,
+            password,
+            type,
+        });
 
+        user.save().then(data => {
+            console.log('data', data);
+            res.send(Result.success('注册成功！'))
 
+            //插入分类
+            if (data.id) {
+                createDefautCateGory(data.id, data.username)
+            }
+
+        }).catch(err => {
+            res.send(res);
+            throw err;
+        });;
+    }
 };
 
 //登录
 exports.login = (req, res) => {
-    let { email, password } = req.body;
-    if (!email) {
-        res.send(Result.validateFailed('用户邮箱不可为空！'))
+    let { username, password } = req.body;
+    if (!username) {
+        res.send(Result.validateFailed('用户名不可为空！'))
         return;
     }
     if (!password) {
@@ -87,19 +82,46 @@ exports.login = (req, res) => {
         return;
     }
     User.findOne({
-        email,
+        username,
         password,
-    })
-        .then(userInfo => {
-            //当前对象
-            console.log('userInfo', userInfo.id);
+    }).then(userInfo => {
+        //当前对象
+
+        if (userInfo) {
             setToken(userInfo).then(response => {
                 res.send(Result.success(response))
             })
-
-        })
-        .catch(err => {
+        } else {
             res.send(Result.validateFailed('账号密码错误！'))
+        }
 
+
+    })
+        .catch(err => {
+            throw err
         });
 };
+
+
+//方法
+//创建默认分类目录
+function createDefautCateGory(id, username) {
+    const category = [
+        { author_id: id, name: '知识技能', username },
+        { author_id: id, name: '应用笔记', username },
+        { author_id: id, name: '生活思考', username },
+        { author_id: id, name: '经验谈', username },
+        { author_id: id, name: '其他', username },
+    ];
+    Category.insertMany(category)
+}
+
+
+// const category = [
+//     { author_id: "669715eae8e9c679d0751bcb", name: '知识技能', username: 'admin' },
+//     { author_id: "669715eae8e9c679d0751bcb", name: '应用笔记', username: 'admin' },
+//     { author_id: "669715eae8e9c679d0751bcb", name: '生活思考', username: 'admin' },
+//     { author_id: "669715eae8e9c679d0751bcb", name: '经验谈', username: 'admin' },
+//     { author_id: "669715eae8e9c679d0751bcb", name: '其他', username: 'admin' },
+// ];
+// Category.insertMany(category)

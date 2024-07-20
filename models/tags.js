@@ -13,8 +13,8 @@ const tagsSchema = new mongoose.Schema({
     //创建者id
     author_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 
-    // 分类描述
-    desc: { type: String, default: '' },
+    //用户名
+    username: { type: String, },
 
     // 创建日期
     create_time: { type: Date, default: Date.now },

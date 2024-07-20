@@ -16,7 +16,11 @@ const articleSchema = new mongoose.Schema({
     keyword: [{ type: String, default: '' }],
 
     // 作者
-    author: { type: String, required: true, validate: /\S+/ },
+    author_id: { type: String, required: true, validate: /\S+/ },
+
+    authorName: { type: String },
+
+    username: { type: String },
 
     // 文章描述
     desc: { type: String, default: '' },

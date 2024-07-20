@@ -6,7 +6,7 @@ let expiresIn = '48h' //expiresln 设置token过期的时间
 var setToken = function (val) {
     return new Promise((resolve, reject) => {
         //{ user_name: user_name, user_id: user_id } 传入需要解析的值（ 一般为用户名，用户id 等）
-        const token = jwt.sign({ id: val.id, name: val.name }, jwtScrect, { expiresIn: expiresIn });
+        const token = jwt.sign({ id: val.id, name: val.name, username: val.username }, jwtScrect, { expiresIn: expiresIn });
         resolve(token)
     })
 }

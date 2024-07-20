@@ -2,15 +2,19 @@ const express = require('express');
 const bodyParser = require('body-parser')
 var cors = require('cors')
 
+
 // 之后每个响应头都会被设置
 const expressJwt = require("express-jwt");
 const secretKey = require('./utils/token').jwtScrect
 
 const hostname = 'localhost';
-const port = 3000;
 
 const app = express();
+let port = require("./config").port
+
 app.use(cors())
+
+
 app.use(bodyParser.urlencoded({ extended: false }))// parse application/x-www-form-urlencoded
 app.use(bodyParser.json())// parse application/json
 app.use(expressJwt.expressjwt({ secret: secretKey, algorithms: ["HS256"] }).unless({
