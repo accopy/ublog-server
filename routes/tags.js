@@ -13,21 +13,3 @@ exports.getTagsList = (req, res) => {
 
     });
 }
-
-
-//获取标签名称
-exports.getTagsOne = (req, res) => {
-    let id = req.query.id;
-    console.log('id', id);
-
-    Tags.find({ _id: id }).then(response => {
-
-        if (response) {
-
-            res.send(Result.success(response))
-        }
-    }).catch(err => {
-        return err
-    });;
-
-};

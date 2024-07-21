@@ -20,8 +20,9 @@ exports.getCategoryList = (req, res) => {
 
 //添加分类
 exports.addCategory = (req, res) => {
-    let { name, desc } = req.body;
+    let { name } = req.body;
     let author_id = req.auth.id
+    let username = req.auth.username
     Category.findOne({
         author_id,
         name,
@@ -31,7 +32,8 @@ exports.addCategory = (req, res) => {
                 let category = new Category({
                     author_id,
                     name,
-                    desc,
+                    username
+
                 });
                 category
                     .save()
