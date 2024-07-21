@@ -1,7 +1,10 @@
 const User = require('../models/user');
 const Category = require('../models/category');
+
+const uploadfunc = require('../utils/multer/uploadfunc');
 const { setToken } = require('../utils/token')
 const Result = require("../utils/utils")
+
 
 //注册
 exports.register = async (req, res) => {
@@ -102,6 +105,22 @@ exports.login = (req, res) => {
         });
 };
 
+//获取用户信息
+exports.myinfo = (req, res) => {
+    let id = req.auth.id
+    User.findOne({ _id: id }).then(result => {
+        res.send(Result.success(result))
+    })
+}
+
+
+//上传图片
+exports.uploadImage = (req, res) => {
+
+    console.log(' req.file', req.body.files);
+
+
+}
 
 //方法
 //创建默认分类目录

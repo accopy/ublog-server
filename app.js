@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser')
 var cors = require('cors')
 
-
 // 之后每个响应头都会被设置
 const expressJwt = require("express-jwt");
 const secretKey = require('./utils/token').jwtScrect
