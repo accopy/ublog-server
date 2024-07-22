@@ -12,11 +12,9 @@ const resolve = (dir) => {
 let storage = multer.diskStorage({
     // 3.1 存储路径
     destination: function (req, file, cb) {
-        console.log('filename', req.file.filename);
-
         // 3.1.1 允许图片上传
         if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-            cb(null, resolve('../public/images'))
+            cb(null, resolve('../../public/images'))
         } else {
             // 3.1.2 限制其他文件上传类型
             cb({ error: 'Mime type not supported' })

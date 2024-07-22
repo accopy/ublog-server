@@ -1,7 +1,9 @@
 const User = require('../models/user');
 const Category = require('../models/category');
 
-const uploadfunc = require('../utils/multer/uploadfunc');
+const upload = require('../utils/multer/upload');
+const imgPath = "/img/images/" // 上传到服务器的虚拟目录
+const updateBaseUrl = require('../config').updateBaseUrl // 上传到服务器地址
 const { setToken } = require('../utils/token')
 const Result = require("../utils/utils")
 
@@ -113,13 +115,28 @@ exports.myinfo = (req, res) => {
     })
 }
 
+//更改用户信息
+exports.updatemyinfo = (req, res) => {
+    const { name, avatar } = req.body
+    console.log('avatar', avatar);
+
+    let id = req.auth.id
+    User.findOneAndUpdate({ _id: id }, {
+        name,
+        avatar,
+        update_time: Date.now()
+    },).then(result => {
+        res.send(Result.success(result))
+    })
+}
+
 
 //上传图片
 exports.uploadImage = (req, res) => {
-
-    console.log(' req.file', req.body.files);
-
-
+    upload(req, res).then(imgsrc => {
+        let result = updateBaseUrl + imgPath + imgsrc
+        res.send(Result.success(result))
+    })
 }
 
 //方法

@@ -10,6 +10,8 @@ const hostname = 'localhost';
 
 const app = express();
 let port = require("./config").port
+// 公开静态文件夹，匹配`虚拟路径img` 到 `真实路径public` 注意这里  /img/ 前后必须都要有斜杠！！！
+app.use('/img/', express.static('./public/'))
 
 app.use(cors())
 
@@ -19,6 +21,14 @@ app.use(bodyParser.json())// parse application/json
 app.use(expressJwt.expressjwt({ secret: secretKey, algorithms: ["HS256"] }).unless({
     path: [/^\/api\//], //'/api'开头的接口无需验证
 }))
+// 禁止缓存指定文件类型的图片，例如 .jpg 和 .png
+app.use((req, res, next) => {
+    if (req.url.endsWith('.jpg') || req.url.endsWith('.png')) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        res.setHeader('Pragma', 'no-cache');
+    }
+    next();
+});
 app.use((err, req, res, next) => {   //错误捕捉
     if (err.name === 'UnauthorizedError') {
         return res.send({ code: 401, msg: '无效的token' })

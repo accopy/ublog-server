@@ -2,7 +2,6 @@
 const Article = require('../models/article');
 const Tags = require('../models/tags');
 const Result = require("../utils/utils")
-
 //新增文章
 exports.addArticle = (req, res) => {
     const {
@@ -16,9 +15,9 @@ exports.addArticle = (req, res) => {
     //设置category属性
     let categoryName = category.label
     let categoryId = category.value
-    // console.log('categoryName', categoryName);
-    // console.log('categoryId', categoryId);
 
+
+    let desc = toText(content)  //生成简介
 
     let tempArticle = null;
     tempArticle = new Article({
@@ -26,6 +25,7 @@ exports.addArticle = (req, res) => {
         content,
         numbers: content.length,
         // tags: tags,
+        desc,
         category: categoryId,
         state,
         tagsName,
@@ -132,7 +132,7 @@ exports.getArticleList = async (req, res) => {
 
             })
             ,
-            Article.find(query).sort({ create_time: -1 }).skip(skipNum).limit(pageSize).catch(err => {
+            Article.find(query, { content: 0 }).sort({ create_time: -1 }).skip(skipNum).limit(pageSize).catch(err => {
                 res.send(Result.validateFailed('服务端错误！'))
 
             })
@@ -403,6 +403,22 @@ async function handleTag(type, arr, user, oldarr) {
 
 
 }
+
+//mark to text
+function toText(mark) {
+    return mark.substr(0, 150)
+        .replace(/\*\*/g, '')  // 移除粗体和斜体标记  
+        .replace(/\*/g, '')
+        .replace(/#.*\n/g, '')  // 移除标题标记  
+        .replace(/!$$.* $$$.* $ /g, '')  // 移除图片  
+        .replace(/$$.*$$$.* $ /g, '')  // 移除链接  
+        .replace(/\n/g, ' ')  // 将换行符替换为空格  
+        .replace(/\s+/g, ' ');  // 替换多余的空格  
+}
+
+
+
+
 
 
 
