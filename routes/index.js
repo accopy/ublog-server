@@ -17,8 +17,13 @@ module.exports = app => {
     app.get('/api/getArticleDetail', blogtopub.getArticleDetail);
     app.get('/api/getArticleTimeLine', blogtopub.getArticleTimeLine);
     app.get('/api/getArticleListSe', blogtopub.getArticleListSe);
-    app.post('/api/getCategoryNum', blogtopub.getCategoryNum);
     app.post('/api/searchArticle', blogtopub.searchArticle)
+    app.post('/api/getCategoryNum', blogtopub.getCategoryNum);
+    app.get('/api/getCategoryList', blogtopub.getCategoryList)
+    app.get('/api/myinfo', blogtopub.myinfo)
+
+
+
 
     // app.post('/api/register', user.register);
     app.post('/api/login', user.login);
@@ -27,18 +32,9 @@ module.exports = app => {
 
     // 上传图片接口
     app.post('/api/uploadImage', user.uploadImage);
-    // app.post('/uploadImage', user.uploadImage);
-    // app.post('/api/uploadImage', upload.single('file'), function (req, res, next) {
-    //     console.log('req.file', req.file);
-
-    //     res.send({ status: 200, message: 'File uploaded successfully' });
-    // });
-
-
 
 
     app.post('/addArticle', article.addArticle)
-    app.post('/getArticleList', article.getArticleList)
     app.get('/getArticleDetail', article.getArticleDetail)
     app.get('/getArticleTimeLine', article.getArticleTimeLine);
     app.get('/getArticleListSe', article.getArticleListSe);
@@ -51,6 +47,7 @@ module.exports = app => {
     app.post('/delCategory', category.delCategory);
     app.post('/getCategoryNum', category.getCategoryNum);
     app.get('/getCategoryList', category.getCategoryList);
+
 
 
     app.get('/getTagsList', tags.getTagsList);

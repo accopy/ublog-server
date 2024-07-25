@@ -118,7 +118,6 @@ exports.myinfo = (req, res) => {
 //更改用户信息
 exports.updatemyinfo = (req, res) => {
     const { name, avatar } = req.body
-    console.log('avatar', avatar);
 
     let id = req.auth.id
     User.findOneAndUpdate({ _id: id }, {

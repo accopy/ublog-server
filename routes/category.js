@@ -73,7 +73,7 @@ exports.delCategory = (req, res) => {
 };
 
 
-//查询分类及其数量
+//查询分类及每个分类的文章数量
 exports.getCategoryNum = (req, res) => {
     let author_id = req.auth.id
     async function getNum() {

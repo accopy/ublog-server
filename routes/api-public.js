@@ -1,6 +1,7 @@
 const Article = require('../models/article');
 const Category = require('../models/category');
 const Tags = require('../models/tags');
+const User = require('../models/user');
 const Result = require("../utils/utils")
 
 const authorUserName = require("../config").authorUserName
@@ -75,7 +76,7 @@ exports.getArticleList = async (req, res) => {
 
             })
             ,
-            Article.find(query).sort({ create_time: -1 }).skip(skipNum).limit(pageSize).catch(err => {
+            Article.find(query, { content: 0 }).sort({ create_time: -1 }).skip(skipNum).limit(pageSize).catch(err => {
                 res.send(Result.validateFailed('服务端错误！'))
 
             })
@@ -171,18 +172,12 @@ exports.getCategoryNum = async (req, res) => {
     }
 
     res.send(Result.success(newResult))
-
-
-
-
-
 }
 
 //获取个人全部标签
 exports.getTagsList = (req, res) => {
-    let author_id = req.auth.id
 
-    Tags.find({ author_id }).then(response => {
+    Tags.find({ username: authorUserName }).then(response => {
 
         if (response) {
             res.send(Result.success(response))
@@ -214,4 +209,18 @@ exports.searchArticle = (req, res) => {
         res.send(Result.validateFailed('请输入查询关键字！'))
     }
 
+}
+
+//获取个人信息
+exports.myinfo = (req, res) => {
+    User.findOne({ username: authorUserName }).then(result => {
+        res.send(Result.success(result))
+    })
+}
+
+//查询分类名称
+exports.getCategoryList = (req, res) => {
+    Category.find({ username: authorUserName }).then(result => {
+        res.send(Result.success(result))
+    })
 }

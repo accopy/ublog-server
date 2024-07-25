@@ -13,14 +13,14 @@ const articleSchema = new mongoose.Schema({
     title: { type: String, required: true, validate: /\S+/ },
 
     // 文章关键字（SEO）
-    keyword: [{ type: String, default: '' }],
+    // keyword: [{ type: String, default: '' }],
 
     // 作者
     author_id: { type: String, required: true, validate: /\S+/ },
 
-    authorName: { type: String },
+    authorName: { type: String }, //作者名称
 
-    username: { type: String },
+    username: { type: String }, //登录账号
 
     // 文章描述
     desc: { type: String, default: '' },
@@ -41,13 +41,8 @@ const articleSchema = new mongoose.Schema({
 
     tagsName: [{ type: String, required: true }],
 
-
-
     // 文章分类
-    category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }],
-    //----
-    categoryName: [{ type: String, required: true }],
-
+    category: [{ type: String, required: true }],
 
     // 创建日期
     create_time: { type: Date, default: Date.now },

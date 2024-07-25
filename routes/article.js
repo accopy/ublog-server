@@ -11,13 +11,8 @@ exports.addArticle = (req, res) => {
         category,
         state,
     } = req.body;
+    let desc = toText(content)   //生成简介
 
-    //设置category属性
-    let categoryName = category.label
-    let categoryId = category.value
-
-
-    let desc = toText(content)  //生成简介
 
     let tempArticle = null;
     tempArticle = new Article({
@@ -26,11 +21,9 @@ exports.addArticle = (req, res) => {
         numbers: content.length,
         // tags: tags,
         desc,
-        category: categoryId,
         state,
+        category,
         tagsName,
-        categoryName: categoryName,
-
     });
 
     tempArticle.author_id = req.auth.id;
@@ -51,98 +44,6 @@ exports.addArticle = (req, res) => {
             throw err
 
         });
-
-
-};
-
-
-
-//获取个人已发表文章
-exports.getArticleList = async (req, res) => {
-    let { pageSize, pageNum, queryinfo } = req.body;
-    let skipNum = (pageNum - 1) * pageSize;
-    let query = null;
-
-
-    //查询类型处理
-    //分类查询
-    if (queryinfo.querytype == 'recent') {
-        query = { author_id: req.auth.id };
-        //执行
-        getPage()
-    }
-    else if (queryinfo.querytype == 'category') {
-        query = { author_id: req.auth.id, category: req.body.queryinfo.categoryid }
-        //执行
-        getPage()
-    }
-    //标签查询
-    else if (queryinfo.querytype == 'tags') {
-        query = { author_id: req.auth.id, tagsName: { $elemMatch: { $eq: req.body.queryinfo.key } } }
-        let num = await Article.countDocuments(query).catch(err => {
-            throw err
-
-        })
-
-        //若无则删除
-        if (num == 0) {
-            console.log('num', num);
-
-            Tags.deleteMany({ name: req.body.queryinfo.key })
-                .then(result => {
-                    console.log('result',);
-                    // 删除标签成功并返回400(data:400)
-                    if (result.deletedCount === 1) {
-                        res.send(Result.success(400))
-                    }
-
-
-                })
-                .catch(err => {
-
-
-                    throw err
-
-                });
-        }
-        else {
-            //若有则查询
-            let response = await Article.find(query).sort({ create_time: -1 }).skip(skipNum).limit(pageSize).catch(err => {
-                throw err
-            })
-
-            let articleList = {}
-
-            articleList.count = num
-            articleList.list = response
-            res.send(Result.success(articleList))
-
-        }
-
-    }
-
-
-    async function getPage(func) {
-        let articleList = {}
-
-        console.log('query', query);
-        result = await Promise.all([
-            Article.countDocuments(query).catch(err => {
-                res.send(Result.validateFailed('服务端错误！'))
-
-            })
-            ,
-            Article.find(query, { content: 0 }).sort({ create_time: -1 }).skip(skipNum).limit(pageSize).catch(err => {
-                res.send(Result.validateFailed('服务端错误！'))
-
-            })
-        ])
-        // console.log('result', result);
-        articleList.count = result[0]
-        articleList.list = result[1]
-        res.send(Result.success(articleList))
-    }
-
 
 
 };
@@ -236,28 +137,38 @@ exports.getArticleListSe = (req, res) => {
 }
 
 //搜索文章
-exports.searchArticle = (req, res) => {
-    let { key } = req.body;
-
-    if (key) {
-        Article.find({
-            author_id: req.auth.id, $or: [
-                { title: { $regex: key, $options: 'i' } }, // 包含关键字1的标题
-                { content: { $regex: key, $options: 'i' } } // 包含关键字2的内容
-            ]
-        }).sort({ create_time: -1 }).then(e => {
-
-            res.send(Result.success(e))
-
-        })
-            .catch(err => {
-                throw err
-
-            });
-    } else {
-        res.send(Result.validateFailed('服务端错误！'))
+exports.searchArticle = async (req, res) => {
+    let { pageParam, category, tags, key } = req.body;
+    //定义分页
+    let pageNum = pageParam.pageNum || 1      //默认第一页
+    let pageSize = pageParam.pageSize || 10   //默认每次10项
+    let skipNum = (pageNum - 1) * pageSize;
+    //设置查询体
+    let query = {
+        author_id: req.auth.id,
+        category: category,
+        tagsName: tags,
+        $or: [
+            { title: { $regex: key, $options: 'i' } }, // 包含关键字1的标题
+            { content: { $regex: key, $options: 'i' } } // 包含关键字2的内容
+        ]
+    }
+    for (prop in query) {
+        if (query[prop] === '') {
+            delete query[prop]
+        }
     }
 
+    let result = await Promise.all([
+        Article.countDocuments(query).catch(err => { res.send(Result.validateFailed('服务端错误！')) }),
+        Article.find(query).sort({ create_time: -1 }).skip(skipNum).limit(pageSize).catch(err => { res.send(Result.validateFailed('服务端错误！')) })
+
+    ])
+
+    let articleList = {}
+    articleList.count = result[0]
+    articleList.list = result[1]
+    res.send(Result.success(articleList))
 }
 
 //更新文章
@@ -276,6 +187,8 @@ exports.updateArticle = (req, res) => {
     //设置category属性
     let categoryName = category.label
     let categoryId = category.value
+
+    let desc = toText(content)  //生成简介
     // console.log('categoryName', categoryName);
     // console.log('categoryId', categoryId);
 
@@ -289,6 +202,7 @@ exports.updateArticle = (req, res) => {
             state,
             tagsName,
             categoryName,
+            desc,
             category: categoryId,
             update_time: Date.now()
         },
@@ -406,7 +320,7 @@ async function handleTag(type, arr, user, oldarr) {
 
 //mark to text
 function toText(mark) {
-    return mark.substr(0, 150)
+    return mark.substr(0, 300)
         .replace(/\*\*/g, '')  // 移除粗体和斜体标记  
         .replace(/\*/g, '')
         .replace(/#.*\n/g, '')  // 移除标题标记  

@@ -29,22 +29,10 @@ app.use((req, res, next) => {
     }
     next();
 });
-app.use((err, req, res, next) => {   //错误捕捉
-    if (err.name === 'UnauthorizedError') {
-        return res.send({ code: 401, msg: '无效的token' })
-    }
-    else if (err.name === 'MongooseError') {
-        return res.send({ code: 401, msg: 'MongooseError' })
-    }
-    else if (err.name == "triggerUncaughtException") {
-        return res.send({ code: 401, msg: 'MongooseError' })
-    }
-    else if (err.name = ' ErrorCaptureStackTrace') {
-        return res.send({ code: 500, msg: 'MongooseError' })
-    }
-    else {
-        return res.send({ code: 500, msg: '其他错误' })
-    }
+app.use((err, req, res, next) => {
+    console.log('app----err', err);
+    //错误捕捉
+    throw err
 })
 
 const route = require('./routes/index'); //将路由文件引入
