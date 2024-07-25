@@ -116,6 +116,19 @@ exports.myinfo = (req, res) => {
 }
 
 //更改用户信息
+// exports.updatemyinfo = (req, res) => {
+//     const { name, avatar } = req.body
+
+//     let id = req.auth.id
+//     User.findOneAndUpdate({ _id: id }, {
+//         name,
+//         avatar,
+//         update_time: Date.now()
+//     },).then(result => {
+//         res.send(Result.success(result))
+//     })
+// }
+
 exports.updatemyinfo = (req, res) => {
     const { name, avatar } = req.body
 

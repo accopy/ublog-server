@@ -28,6 +28,7 @@ exports.addArticle = (req, res) => {
 
     tempArticle.author_id = req.auth.id;
     tempArticle.username = req.auth.username;
+    tempArticle.authorName = req.auth.name
 
     tempArticle
         .save()

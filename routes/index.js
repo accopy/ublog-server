@@ -21,6 +21,7 @@ module.exports = app => {
     app.post('/api/getCategoryNum', blogtopub.getCategoryNum);
     app.get('/api/getCategoryList', blogtopub.getCategoryList)
     app.get('/api/myinfo', blogtopub.myinfo)
+    app.get('/api/getTagsList', blogtopub.getTagsList)
 
 
 
