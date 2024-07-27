@@ -8,9 +8,6 @@ const tags = require('./tags');
 const blogtopub = require("./api-public")
 
 
-
-
-
 module.exports = app => {
 
     app.post('/api/getArticleList', blogtopub.getArticleList);
@@ -23,17 +20,11 @@ module.exports = app => {
     app.get('/api/myinfo', blogtopub.myinfo)
     app.get('/api/getTagsList', blogtopub.getTagsList)
 
-
-
-
     // app.post('/api/register', user.register);
     app.post('/api/login', user.login);
+    app.post('/api/uploadImage', user.uploadImage);     // 上传图片接口
     app.get('/myinfo', user.myinfo);
     app.post('/updatemyinfo', user.updatemyinfo);
-
-    // 上传图片接口
-    app.post('/api/uploadImage', user.uploadImage);
-
 
     app.post('/addArticle', article.addArticle)
     app.get('/getArticleDetail', article.getArticleDetail)
@@ -43,18 +34,12 @@ module.exports = app => {
     app.post('/updateArticle', article.updateArticle);
     app.post('/delArticle', article.delArticle);
 
-
     app.post('/addCategory', category.addCategory);
     app.post('/delCategory', category.delCategory);
     app.post('/getCategoryNum', category.getCategoryNum);
     app.get('/getCategoryList', category.getCategoryList);
 
-
-
     app.get('/getTagsList', tags.getTagsList);
-
-
-
 
 };
 
