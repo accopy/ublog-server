@@ -114,19 +114,6 @@ exports.myinfo = (req, res) => {
 };
 
 //更改用户信息
-// exports.updatemyinfo = (req, res) => {
-//     const { name, avatar } = req.body
-
-//     let id = req.auth.id
-//     User.findOneAndUpdate({ _id: id }, {
-//         name,
-//         avatar,
-//         update_time: Date.now()
-//     },).then(result => {
-//         res.send(Result.success(result))
-//     })
-// }
-
 exports.updatemyinfo = (req, res) => {
   const { name, avatar } = req.body;
 
@@ -163,12 +150,3 @@ function createDefautCateGory(id, username) {
   ];
   Category.insertMany(category);
 }
-
-// const category = [
-//     { author_id: "669715eae8e9c679d0751bcb", name: '知识技能', username: 'admin' },
-//     { author_id: "669715eae8e9c679d0751bcb", name: '应用笔记', username: 'admin' },
-//     { author_id: "669715eae8e9c679d0751bcb", name: '生活思考', username: 'admin' },
-//     { author_id: "669715eae8e9c679d0751bcb", name: '经验谈', username: 'admin' },
-//     { author_id: "669715eae8e9c679d0751bcb", name: '其他', username: 'admin' },
-// ];
-// Category.insertMany(category)

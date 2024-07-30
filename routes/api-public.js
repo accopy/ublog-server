@@ -122,6 +122,8 @@ exports.getArticleTimeLine = async (req, res) => {
     }
   });
 
+  // console.log('obj', obj);
+
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const element = obj[key];
@@ -131,8 +133,8 @@ exports.getArticleTimeLine = async (req, res) => {
       archiveList.push(item);
     }
   }
-  // console.log('archiveList', archiveList);
-  res.send(Result.success(archiveList));
+  // console.log('archiveList', archiveList.reverse());
+  res.send(Result.success(archiveList.reverse()));
 };
 
 //获取最近更新
