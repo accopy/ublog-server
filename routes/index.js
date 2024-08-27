@@ -18,11 +18,11 @@ module.exports = (app) => {
   app.get('/api/myinfo', blogtopub.myinfo);
   app.get('/api/getTagsList', blogtopub.getTagsList);
 
-  // app.post('/api/register', user.register);
+  // app.post('/api/register', user.register); //关闭注册
   app.post('/api/login', user.login);
-  app.post('/api/uploadImage', user.uploadImage); // 上传图片接口
   app.get('/myinfo', user.myinfo);
   app.post('/updatemyinfo', user.updatemyinfo);
+  // app.post('/api/uploadImage', user.uploadImage); // 上传图片接口,暂时弃用
 
   app.post('/addArticle', article.addArticle);
   app.get('/getArticleDetail', article.getArticleDetail);

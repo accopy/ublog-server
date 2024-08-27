@@ -1,6 +1,6 @@
 let jwt = require('jsonwebtoken');
 let jwtScrect = 'thekey 9527'; //签名
-let expiresIn = '48h'; //expiresln 设置token过期的时间
+let expiresIn = '240h'; //设置token过期的时间
 
 //登录接口 生成token的方法
 var setToken = function (val) {

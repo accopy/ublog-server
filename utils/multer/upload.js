@@ -1,3 +1,4 @@
+//上传图片方法
 // 1. 引入配置好的multerConfig
 const multerConfig = require('./multerConfig');
 

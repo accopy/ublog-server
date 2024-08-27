@@ -30,8 +30,13 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+//异常处理
 app.use((err, req, res, next) => {
-  console.log('app----err', err);
+  if (err.status == 401) {
+    res.send({ code: 401, data: '登录过期' });
+    return;
+  }
   //错误捕捉
   throw err;
 });

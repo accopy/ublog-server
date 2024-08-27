@@ -1,14 +1,11 @@
 //服务端口
-const port = 3000
+const port = 3000;
 
-//用户名
-const authorUserName = 'admin'
-
-const updateBaseUrl = `http://localhost:${port}`
-
+const authorUserName = 'admin'; //用户名
+const updateBaseUrl = `http://localhost:${port}`; //默认上传地址，暂时废弃
 
 module.exports = {
-    port,
-    authorUserName,
-    updateBaseUrl
-}
+  port,
+  authorUserName,
+  updateBaseUrl,
+};
