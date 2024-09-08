@@ -1,28 +1,27 @@
-/*
- *所有的路由接口
- */
+//接口入口
 const user = require('./user');
 const article = require('./article');
 const category = require('./category');
 const tags = require('./tags');
-const blogtopub = require('./api-public');
+//无需token可访问
+const api_public = require('./api_public');
 
 module.exports = (app) => {
-  app.post('/api/getArticleList', blogtopub.getArticleList);
-  app.get('/api/getArticleDetail', blogtopub.getArticleDetail);
-  app.get('/api/getArticleTimeLine', blogtopub.getArticleTimeLine);
-  app.get('/api/getArticleListSe', blogtopub.getArticleListSe);
-  app.post('/api/searchArticle', blogtopub.searchArticle);
-  app.post('/api/getCategoryNum', blogtopub.getCategoryNum);
-  app.get('/api/getCategoryList', blogtopub.getCategoryList);
-  app.get('/api/myinfo', blogtopub.myinfo);
-  app.get('/api/getTagsList', blogtopub.getTagsList);
+  app.post('/api/getArticleList', api_public.getArticleList);
+  app.get('/api/getArticleDetail', api_public.getArticleDetail);
+  app.get('/api/getArticleTimeLine', api_public.getArticleTimeLine);
+  app.get('/api/getArticleListSe', api_public.getArticleListSe);
+  app.post('/api/searchArticle', api_public.searchArticle);
+  app.post('/api/getCategoryNum', api_public.getCategoryNum);
+  app.get('/api/getCategoryList', api_public.getCategoryList);
+  app.get('/api/myinfo', api_public.myinfo);
+  app.get('/api/getTagsList', api_public.getTagsList);
 
   // app.post('/api/register', user.register); //关闭注册
   app.post('/api/login', user.login);
   app.get('/myinfo', user.myinfo);
   app.post('/updatemyinfo', user.updatemyinfo);
-  // app.post('/api/uploadImage', user.uploadImage); // 上传图片接口,暂时弃用
+  app.post('/api/uploadImage', user.uploadImage);
 
   app.post('/addArticle', article.addArticle);
   app.get('/getArticleDetail', article.getArticleDetail);

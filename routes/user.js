@@ -1,11 +1,17 @@
 const User = require('../models/user');
-const Category = require('../models/category');
-
-const upload = require('../utils/multer/upload');
-const imgPath = '/img/images/'; // 上传到服务器的虚拟目录
-const updateBaseUrl = require('../config').updateBaseUrl; // 上传到服务器地址
+const Result = require('../utils/BaseResultCode');
 const { setToken } = require('../utils/token');
-const Result = require('../utils/utils');
+
+//上传图片
+const { uploadAddress } = require('../systemConfig'); // 上传到服务器地址
+const imgPath = '/img/images/'; // 上传到服务器的虚拟目录
+const upload = require('../utils/multer/upload');
+exports.uploadImage = (req, res) => {
+  upload(req, res).then((imgsrc) => {
+    let result = uploadAddress + imgPath + imgsrc;
+    res.send(Result.success(result));
+  });
+};
 
 //注册
 exports.register = async (req, res) => {
@@ -129,24 +135,3 @@ exports.updatemyinfo = (req, res) => {
     res.send(Result.success(result));
   });
 };
-
-//上传图片
-exports.uploadImage = (req, res) => {
-  upload(req, res).then((imgsrc) => {
-    let result = updateBaseUrl + imgPath + imgsrc;
-    res.send(Result.success(result));
-  });
-};
-
-//方法
-//创建默认分类目录
-function createDefautCateGory(id, username) {
-  const category = [
-    { author_id: id, name: '知识技能', username },
-    { author_id: id, name: '应用笔记', username },
-    { author_id: id, name: '生活思考', username },
-    { author_id: id, name: '经验谈', username },
-    { author_id: id, name: '其他', username },
-  ];
-  Category.insertMany(category);
-}

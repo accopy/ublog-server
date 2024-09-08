@@ -1,4 +1,4 @@
-const Result = require('../utils/utils');
+const Result = require('../utils/BaseResultCode');
 const Tags = require('../models/tags');
 
 //获取个人全部标签

@@ -10,8 +10,10 @@ const mongoose = require('./db.js');
 const categorySchema = new mongoose.Schema({
   // 分类名称
   name: { type: String, required: true, validate: /\S+/ },
+
   //创建者id
   author_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+
   username: { type: String, required: true },
 
   // 创建日期

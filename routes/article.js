@@ -1,6 +1,6 @@
 const Article = require('../models/article');
 const Tags = require('../models/tags');
-const Result = require('../utils/utils');
+const Result = require('../utils/BaseResultCode');
 //新增文章
 exports.addArticle = (req, res) => {
   const { title, content, tagsName, category, state } = req.body;

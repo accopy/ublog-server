@@ -3,9 +3,9 @@ const Article = require('../models/article');
 const Category = require('../models/category');
 const Tags = require('../models/tags');
 const User = require('../models/user');
-const Result = require('../utils/utils');
+const Result = require('../utils/BaseResultCode');
 
-const authorUserName = require('../config').authorUserName;
+const { authorUserName } = require('../systemConfig');
 
 //获取文章
 exports.getArticleList = async (req, res) => {

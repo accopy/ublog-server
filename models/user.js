@@ -3,20 +3,30 @@ const mongoose = require('./db.js');
 //定义结构
 let userSchema = mongoose.Schema(
   {
+    /**
+     *网名
+     */
     name: {
       type: String,
       required: true,
       default: 'user',
+    },
+    /**
+     *账号
+     */
+    username: {
+      type: String,
+      required: true,
     },
     email: {
       type: String,
       default: '',
       validate: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/,
     },
-    username: {
-      type: String,
-      required: true,
-    },
+
+    /**
+     *头像base64
+     */
     avatar: {
       type: String,
       default: 'null',

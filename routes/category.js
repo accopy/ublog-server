@@ -1,4 +1,4 @@
-const Result = require('../utils/utils');
+const Result = require('../utils/BaseResultCode');
 const Category = require('../models/category');
 
 const Article = require('../models/article');
