@@ -4,14 +4,15 @@ const Result = require('../utils/BaseResultCode');
 //新增文章
 exports.addArticle = (req, res) => {
   const { title, content, tagsName, category, state } = req.body;
-  let desc = toText(content); //生成简介
+
+  //生成简介
+  let desc = toText(content);
 
   let tempArticle = null;
   tempArticle = new Article({
     title,
     content,
     numbers: content.length,
-    // tags: tags,
     desc,
     state,
     category,
@@ -86,22 +87,6 @@ exports.getArticleTimeLine = async (req, res) => {
   }
   console.log('archiveList', archiveList);
   res.send(Result.success(archiveList));
-
-  // 聚合查询
-  // let result = await Article.aggregate([
-  //     {
-  //         $match: { author: req.auth.id }
-  //     },
-  //     {
-  //         $group: {
-  //             _id: { $year: "$create_time" },  // 按照日期字段的年份进行分组
-
-  //         }
-  //     },
-  //     {
-  //         $sort: { _id: 1 }  // 按年份升序排序
-  //     }
-  // ]);
 };
 
 //获取最近更新
@@ -165,7 +150,6 @@ exports.searchArticle = async (req, res) => {
 exports.updateArticle = (req, res) => {
   const { title, content, img_url, category, state, tagsName, _id } = req.body;
   // console.log('传过来的tagsName', tagsName);
-
   //设置category属性
   let categoryName = category.label;
   let categoryId = category.value;
