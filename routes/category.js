@@ -45,6 +45,7 @@ exports.addCategory = (req, res) => {
       throw err;
     });
 };
+
 //删除分类
 exports.delCategory = (req, res) => {
   let { id } = req.body;
